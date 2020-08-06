@@ -2,12 +2,26 @@ package com.upskilling.clientmanager.api.bean;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Client {
+
+	private String id;
 	private String name;
 	private Boolean caseSelection;
 	private Boolean patientSelection;
 	private List<String> products;
 	private String url;
+	private Boolean status;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getName() {
 		return name;
@@ -49,10 +63,18 @@ public class Client {
 		this.url = url;
 	}
 
+	public Boolean getStatus() {
+		return status;
+	}
+
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
-		return "Client [name=" + name + ", caseSelection=" + caseSelection + ", patientSelection=" + patientSelection
-				+ ", products=" + products + ", url=" + url + "]";
+		return "Client [id=" + id + ", name=" + name + ", caseSelection=" + caseSelection + ", patientSelection="
+				+ patientSelection + ", products=" + products + ", url=" + url + ", status=" + status + "]";
 	}
 
 }

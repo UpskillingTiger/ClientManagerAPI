@@ -1,5 +1,6 @@
 package com.upskilling.clientmanager.api.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.upskilling.clientmanager.api.bean.Client;
-import com.upskilling.clientmanager.api.bean.ClientConfiguration;
-import com.upskilling.clientmanager.api.bean.ClientConfigurationWrapper;
+import com.upskilling.clientmanager.api.bean.ClientsWrapper;
 import com.upskilling.clientmanager.api.model.ClientModel;
-import com.upskilling.clientmanager.api.model.ClientModelWrapper;
 import com.upskilling.clientmanager.api.repository.ClientRepository;
 
 @RestController
@@ -38,13 +37,13 @@ public class ClientController {
 	}
 
 	@PutMapping("/client")
-	public ResponseEntity<HttpStatus> modifyClient(@RequestBody ClientConfigurationWrapper clientConfigurationWrapper) {
+	public ResponseEntity<HttpStatus> modifyClient(@RequestBody ClientsWrapper clientsWrapper) {
 
-		for (ClientConfiguration clientConfiguration : clientConfigurationWrapper.getClientConfigurations()) {
-			Optional<ClientModel> clientModelData = clientRepository.findById(clientConfiguration.getId());
+		for (Client client : clientsWrapper.getClients()) {
+			Optional<ClientModel> clientModelData = clientRepository.findById(client.getId());
 			if (clientModelData.isPresent()) {
 				ClientModel clientModel = clientModelData.get();
-				clientModel.setStatus(clientConfiguration.getStatus());
+				clientModel.setStatus(client.getStatus());
 				clientRepository.save(clientModel);
 			} else {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -56,13 +55,21 @@ public class ClientController {
 	}
 
 	@GetMapping("/client")
-	public ResponseEntity<ClientModelWrapper> getClient() {
+	public ResponseEntity<ClientsWrapper> getClient() {
 
-		ClientModelWrapper clientModelWrapper = new ClientModelWrapper();
-		List<ClientModel> allClients = clientRepository.findAll();
-		clientModelWrapper.setClientModels(allClients);
+		ClientsWrapper clientsWrapper = new ClientsWrapper();
+		List<Client> clients = new ArrayList<Client>();
 
-		return new ResponseEntity<>(clientModelWrapper, HttpStatus.OK);
+		List<ClientModel> allClientModels = clientRepository.findAll();
+		for (ClientModel clientModel : allClientModels) {
+			Client client = new Client();
+			BeanUtils.copyProperties(clientModel, client);
+			clients.add(client);
+		}
+
+		clientsWrapper.setClients(clients);
+
+		return new ResponseEntity<>(clientsWrapper, HttpStatus.OK);
 
 	}
 
