@@ -18,6 +18,7 @@ import com.upskilling.clientmanager.api.bean.Client;
 import com.upskilling.clientmanager.api.bean.ClientConfiguration;
 import com.upskilling.clientmanager.api.bean.ClientConfigurationWrapper;
 import com.upskilling.clientmanager.api.model.ClientModel;
+import com.upskilling.clientmanager.api.model.ClientModelWrapper;
 import com.upskilling.clientmanager.api.repository.ClientRepository;
 
 @RestController
@@ -55,11 +56,13 @@ public class ClientController {
 	}
 
 	@GetMapping("/client")
-	public ResponseEntity<List<ClientModel>> getClient() {
+	public ResponseEntity<ClientModelWrapper> getClient() {
 
+		ClientModelWrapper clientModelWrapper = new ClientModelWrapper();
 		List<ClientModel> allClients = clientRepository.findAll();
+		clientModelWrapper.setClientModels(allClients);
 
-		return new ResponseEntity<>(allClients, HttpStatus.OK);
+		return new ResponseEntity<>(clientModelWrapper, HttpStatus.OK);
 
 	}
 
