@@ -1,4 +1,4 @@
-package com.upskilling.clientmanager.api.controller;
+package com.upskilling.clientmanager.api.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +22,11 @@ import com.upskilling.clientmanager.api.repository.ClientRepository;
 
 @RestController
 @RequestMapping("/api")
-public class ClientController {
+public class CaseService {
 	@Autowired
 	private ClientRepository clientRepository;
 
-	@PostMapping("/client")
+	@PostMapping("/case")
 	public ResponseEntity<HttpStatus> createClient(@RequestBody Client client) {
 		System.out.println("client is .." + client);
 		ClientModel clientModel = new ClientModel();
@@ -36,7 +36,7 @@ public class ClientController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@PutMapping("/client")
+	@PutMapping("/case")
 	public ResponseEntity<HttpStatus> modifyClient(@RequestBody ClientsWrapper clientsWrapper) {
 
 		for (Client client : clientsWrapper.getClients()) {
@@ -54,7 +54,7 @@ public class ClientController {
 
 	}
 
-	@GetMapping("/client")
+	@GetMapping("/case")
 	public ResponseEntity<ClientsWrapper> getClient() {
 
 		ClientsWrapper clientsWrapper = new ClientsWrapper();
