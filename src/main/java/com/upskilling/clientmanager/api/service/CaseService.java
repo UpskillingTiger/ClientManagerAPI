@@ -3,6 +3,7 @@ package com.upskilling.clientmanager.api.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -26,6 +27,8 @@ public class CaseService {
 	private CaseRepository caseRepository;
 	@Autowired
 	private ClientService clientService;
+
+	private String vendorData;
 
 	@PostMapping("/case")
 	public ResponseEntity<HttpStatus> receiveCase(@RequestBody CaseModel caseModel) {
@@ -79,6 +82,17 @@ public class CaseService {
 				}
 			}
 		}
+	}
+
+	@PostMapping("/vendor1")
+	public ResponseEntity<HttpStatus> postData(HttpEntity<String> httpEntity) {
+		vendorData = httpEntity.getBody();
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@GetMapping("/vendor1")
+	public String getData() {
+		return vendorData;
 	}
 
 }
