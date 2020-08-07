@@ -8,14 +8,14 @@ services:
     volumes:
       - mongodb_data_container:/data/db
   api:
-    image: clientmanagerapi
+    image: gcr.io/$PROJECT_ID/clientmanagerapi
     container_name: clientmanagerapicontainer
     ports:
     - 9091:8080
     links:
     - api-database  
   portal:
-    image: clientmanager
+    image: gcr.io/$PROJECT_ID/clientmanager
     container_name: clientmanagercontainer
     ports:
     - 9092:8080
