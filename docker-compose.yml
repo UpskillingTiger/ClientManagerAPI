@@ -6,23 +6,20 @@ services:
     ports:
     - 27017:27017
     volumes:
-      - mongodb_data_container:/data/db
+    - mongodb_data_container:/data/db
   api:
-    image: gcr.io/$PROJECT_ID/clientmanagerapi
+    image: clientmanagerapi
     container_name: clientmanagerapicontainer
     ports:
     - 9091:8080
     links:
-    - api-database  
+    - api-database
   portal:
-    image: gcr.io/$PROJECT_ID/clientmanager
+    image: clientmanager
     container_name: clientmanagercontainer
     ports:
     - 9092:8080
     links:
-    - api 
-    
+    - api
 volumes:
-  mongodb_data_container:
-  
- 
+  mongodb_data_container: null
