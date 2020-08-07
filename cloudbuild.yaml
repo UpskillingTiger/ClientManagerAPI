@@ -12,138 +12,19 @@ steps:
   args:
   - build
   - -t
-  - gcr.io/$PROJECT_ID/clientmanagerapi
+  - gcr.io/$PROJECT_ID/clientmanagerapi:$COMMIT_SHA
   - --build-arg=JAR_FILE=target/*.jar
   - .
+- name: gcr.io/cloud-builders/docker
+  args:
+  - push
+  - gcr.io/$PROJECT_ID/clientmanagerapi:$COMMIT_SHA
+- name: gcr.io/cloud-builders/gke-deploy
+  args:
+  - run
+  - --filename=kub.yaml
+  - --image=gcr.io/$PROJECT_ID/clientmanagerapi:$COMMIT_SHA
+  - --location=us-central1-c
+  - --cluster=tiger-cluster-1
 images:
-- gcr.io/$PROJECT_ID/clientmanagerapi
-
-
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: mongo
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: mongo
-    spec:
-      containers:
-        - name: mongo
-          image: mongo
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-        - mountPath: /data/db
-          name: mongodb-data-container
-      restartPolicy: Always
-      volumes:
-      - name: mongodb-data-container
-        persistentVolumeClaim:
-          claimName: mongodb-data-container  
----
-
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  creationTimestamp: null
-  labels:
-  name: mongodb-data-container
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Mi
-status: {}          
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api-database
-  labels:
-    name: api-database
-spec:
-  ports:
-    - port: 27017
-      targetPort: 27017
-      protocol: TCP
-      name: '27017'
-  selector:
-    app: mongo
-  type: LoadBalancer
-
-
----
-
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: clientmanagerapi
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: clientmanagerapi
-    spec:
-      containers:
-        - name: clientmanagerapi
-          image: gcr.io/$PROJECT_ID/clientmanagerapi
-          ports:
-            - containerPort: 8080
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api
-  labels:
-    name: api
-spec:
-  ports:
-    - port: 9091
-      targetPort: 8080
-      protocol: TCP
-      name: '9091'
-  selector:
-    app: clientmanagerapi
-  type: LoadBalancer
-
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: clientmanager
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: clientmanager
-    spec:
-      containers:
-        - name: clientmanager
-          image: gcr.io/$PROJECT_ID/clientmanager
-          ports:
-            - containerPort: 8080
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: portal
-  labels:
-    name: portal
-spec:
-  ports:
-    - port: 9092
-      targetPort: 8080
-      protocol: TCP
-      name: '9092'
-  selector:
-    app: clientmanager
-  type: LoadBalancer  
+- gcr.io/$PROJECT_ID/clientmanagerapi:$COMMIT_SHA

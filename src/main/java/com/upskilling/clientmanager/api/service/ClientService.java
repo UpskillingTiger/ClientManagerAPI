@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,6 +71,15 @@ public class ClientService {
 		clientsWrapper.setClients(clients);
 
 		return new ResponseEntity<>(clientsWrapper, HttpStatus.OK);
+
+	}
+
+	@DeleteMapping("/client")
+	public ResponseEntity<ClientsWrapper> deleteClient() {
+
+		clientRepository.deleteAll();
+
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
