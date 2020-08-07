@@ -12,8 +12,8 @@ steps:
   args:
   - build
   - -t
-  - gcr.io/$GOOGLE_CLOUD_PROJECT/clientmanagerapi
+  - gcr.io/$PROJECT_ID/clientmanagerapi
   - --build-arg=JAR_FILE=target/*.jar
   - .
 images:
-- gcr.io/$GOOGLE_CLOUD_PROJECT/clientmanagerapi
+- gcr.io/$PROJECT_ID/clientmanagerapi
