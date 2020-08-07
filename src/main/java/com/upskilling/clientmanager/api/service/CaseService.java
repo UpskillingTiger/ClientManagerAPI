@@ -95,4 +95,10 @@ public class CaseService {
 		return vendorData;
 	}
 
+	@DeleteMapping("/vendor1")
+	public String deleteData() {
+		vendorData = "";
+		return "OK";
+	}
+
 }
