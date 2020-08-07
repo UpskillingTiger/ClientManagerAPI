@@ -1,76 +1,84 @@
 package com.upskilling.clientmanager.api.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.upskilling.clientmanager.api.bean.Client;
 import com.upskilling.clientmanager.api.bean.ClientsWrapper;
-import com.upskilling.clientmanager.api.model.ClientModel;
-import com.upskilling.clientmanager.api.repository.ClientRepository;
+import com.upskilling.clientmanager.api.model.CaseModel;
+import com.upskilling.clientmanager.api.repository.CaseRepository;
 
 @RestController
 @RequestMapping("/api")
 public class CaseService {
 	@Autowired
-	private ClientRepository clientRepository;
+	private CaseRepository caseRepository;
+	@Autowired
+	private ClientService clientService;
 
 	@PostMapping("/case")
-	public ResponseEntity<HttpStatus> createClient(@RequestBody Client client) {
-		System.out.println("client is .." + client);
-		ClientModel clientModel = new ClientModel();
-		BeanUtils.copyProperties(client, clientModel);
-		clientModel.setStatus(true);
-		clientRepository.save(clientModel);
+	public ResponseEntity<HttpStatus> receiveCase(@RequestBody CaseModel caseModel) {
+		System.out.println("Incoming case payload is ... " + caseModel);
+
+		List<CaseModel> foundCaseModel = caseRepository.findByCaseNumber(caseModel.getCaseNumber());
+
+		if (!CollectionUtils.isEmpty(foundCaseModel)) {
+			caseModel.setId(foundCaseModel.get(0).getId());
+		}
+
+		caseRepository.save(caseModel);
+		send(caseModel);
+
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@PutMapping("/case")
-	public ResponseEntity<HttpStatus> modifyClient(@RequestBody ClientsWrapper clientsWrapper) {
+	@DeleteMapping("/case")
+	public ResponseEntity<ClientsWrapper> deleteClient() {
 
-		for (Client client : clientsWrapper.getClients()) {
-			Optional<ClientModel> clientModelData = clientRepository.findById(client.getId());
-			if (clientModelData.isPresent()) {
-				ClientModel clientModel = clientModelData.get();
-				clientModel.setStatus(client.getStatus());
-				clientRepository.save(clientModel);
-			} else {
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-		}
+		caseRepository.deleteAll();
 
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
 	@GetMapping("/case")
-	public ResponseEntity<ClientsWrapper> getClient() {
+	public ResponseEntity<List<CaseModel>> getClient() {
 
-		ClientsWrapper clientsWrapper = new ClientsWrapper();
-		List<Client> clients = new ArrayList<Client>();
+		List<CaseModel> allClientModels = caseRepository.findAll();
+		return new ResponseEntity<>(allClientModels, HttpStatus.OK);
 
-		List<ClientModel> allClientModels = clientRepository.findAll();
-		for (ClientModel clientModel : allClientModels) {
-			Client client = new Client();
-			BeanUtils.copyProperties(clientModel, client);
-			clients.add(client);
+	}
+
+	private void send(CaseModel caseModel) {
+		List<Client> clients = clientService.getClient().getBody().getClients();
+		if (!CollectionUtils.isEmpty(clients)) {
+			for (Client client : clients) {
+				if (client.getCaseSelection()) {
+					List<String> products = client.getProducts();
+					if (!CollectionUtils.isEmpty(products)) {
+						if (products.contains(caseModel.getProduct())) {
+							RestTemplate restTemplate = new RestTemplate();
+							ResponseEntity<String> respEntity = restTemplate.postForEntity(client.getUrl(), caseModel,
+									String.class);
+							HttpStatus body = respEntity.getStatusCode();
+							System.out.println(" Response after sent ..." + body);
+						}
+
+					}
+				}
+			}
 		}
-
-		clientsWrapper.setClients(clients);
-
-		return new ResponseEntity<>(clientsWrapper, HttpStatus.OK);
-
 	}
 
 }

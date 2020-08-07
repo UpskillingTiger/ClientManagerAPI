@@ -1,15 +1,26 @@
 package com.upskilling.clientmanager.api.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "case")
 public class CaseModel {
+	@Id
+	private String id;
 	private String caseNumber;
 	private String caseType;
 	private String priority;
 	private String origin;
 	private String product;
 	private String status;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getCaseNumber() {
 		return caseNumber;
@@ -61,8 +72,8 @@ public class CaseModel {
 
 	@Override
 	public String toString() {
-		return "CaseModel [caseNumber=" + caseNumber + ", caseType=" + caseType + ", priority=" + priority + ", origin="
-				+ origin + ", product=" + product + ", status=" + status + "]";
+		return "CaseModel [id=" + id + ", caseNumber=" + caseNumber + ", caseType=" + caseType + ", priority="
+				+ priority + ", origin=" + origin + ", product=" + product + ", status=" + status + "]";
 	}
 
 }

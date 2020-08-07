@@ -1,12 +1,23 @@
 package com.upskilling.clientmanager.api.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "patient")
 public class PatientModel {
+	@Id
+	private String id;
 	private String firstName;
 	private String lastName;
 	private String contactId;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getFirstName() {
 		return firstName;
@@ -34,7 +45,8 @@ public class PatientModel {
 
 	@Override
 	public String toString() {
-		return "PatientModel [firstName=" + firstName + ", lastName=" + lastName + ", contactId=" + contactId + "]";
+		return "PatientModel [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", contactId="
+				+ contactId + "]";
 	}
 
 }
